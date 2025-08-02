@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart' hide Badge;
+import 'package:untitled6/screens/cart_screen.dart';
 import '../widgets/products_grid.dart';
 import '../widgets/badge.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart.dart';
+import './cart_screen.dart';
 
 enum FilterOptions {
   Favorites,
@@ -61,7 +63,9 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                   Icons.shopping_cart,
                   color: Colors.white,
                     ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed(CartScreen.routeName);
+                },
               ),
            ),
          ],
