@@ -34,13 +34,17 @@ class CartScreen extends StatelessWidget {
                       color: Theme.of(context).primaryTextTheme.titleLarge?.color,
                       ),
                     ),
+                    padding: EdgeInsets.symmetric(horizontal: 7, vertical: 4), // Reduce padding for smaller size
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
+                  SizedBox(width: 20),
+                  // Padding(padding: EdgeInsets.only(left: 20.0),)
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Theme.of(context).primaryColor,
                       backgroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     ),
                     child: Text('ORDER NOW'),
                   ),
@@ -53,6 +57,7 @@ class CartScreen extends StatelessWidget {
             itemCount: cart.items.length,
             itemBuilder: (ctx, i) => CartItems(
                 cart.items.values.toList()[i].id,
+                cart.items.keys.toList()[i],
                 cart.items.values.toList()[i].price,
                 cart.items.values.toList()[i].quantity,
                 cart.items.values.toList()[i].title,
