@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
            title: 'My Shop',
            theme: ThemeData(
              primarySwatch: Colors.blue,
+             splashFactory: InkRipple.splashFactory,
           ),
         home: ProductsOverviewScreen(),
            routes: {
