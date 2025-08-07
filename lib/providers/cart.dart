@@ -58,8 +58,6 @@ class Cart with ChangeNotifier {
           quantity: 1,
         ),
       );
-    } else {
-      _items.remove(productId);
     }
     notifyListeners(); // ✅ Moved outside for both cases
   }
@@ -83,6 +81,8 @@ class Cart with ChangeNotifier {
               price: existingCartItem.price
           )
       );
+    } else {
+      _items.remove(productId);
     }
   }
 
