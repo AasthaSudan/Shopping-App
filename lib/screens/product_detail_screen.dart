@@ -14,8 +14,18 @@ class ProductDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final productId =
         ModalRoute.of(context)?.settings.arguments as String;
-    final loadedProduct = Provider.of<Products>(context, listen: false,)
-        .findById(productId);
+    final loadedProduct = Provider.of<Products>(
+      context,
+      listen: false,
+    ).findById(productId);
+
+    if (loadedProduct == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text("Product Not Found")),
+        body: Center(child: Text("The product could not be found.")),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(loadedProduct.title),
