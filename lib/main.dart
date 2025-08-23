@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled6/screens/cart_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import './screens/cart_screen.dart';
 import './screens/products_overview_screen.dart';
 import './screens/product_detail_screen.dart';
 import './providers/cart_provider.dart';
@@ -8,9 +10,13 @@ import './providers/cart.dart';
 import './providers/orders.dart';
 import './screens/orders_screen.dart';
 import './screens/user_products_screen.dart';
-import './screens/edit_product_screen.dart';
+import './screens/edit_product_screen.dart'; // Import the login screen
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -33,13 +39,27 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           splashFactory: InkRipple.splashFactory,
         ),
-        home: ProductsOverviewScreen(),
+        home: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(), // Listen to auth state changes
+          builder: (ctx, userSnapshot) {
+            if (userSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator()); // Loading indicator
+            }
+
+            if (userSnapshot.hasData) {
+              return ProductsOverviewScreen(); // Navigate to Products if logged in
+            }
+
+            return LoginScreen(); // Show Login if not logged in
+          },
+        ),
         routes: {
           ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
           CartScreen.routeName: (ctx) => CartScreen(),
           OrdersScreen.routeName: (ctx) => OrdersScreen(),
           UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
           EditProductScreen.routeName: (ctx) => EditProductScreen(),
+          LoginScreen.routeName: (ctx) => LoginScreen(), // Add login route
         },
         debugShowCheckedModeBanner: false,
       ),
