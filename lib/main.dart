@@ -10,11 +10,16 @@ import './providers/cart.dart';
 import './providers/orders.dart';
 import './screens/orders_screen.dart';
 import './screens/user_products_screen.dart';
-import './screens/edit_product_screen.dart'; // Import the login screen
+import './screens/edit_product_screen.dart';
+import './screens/auth_screen.dart';
+import 'firebase_options.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  ); // Initialize Firebase
   runApp(MyApp());
 }
 
@@ -50,7 +55,7 @@ class MyApp extends StatelessWidget {
               return ProductsOverviewScreen(); // Navigate to Products if logged in
             }
 
-            return LoginScreen(); // Show Login if not logged in
+            return AuthScreen(); // Show Login if not logged in
           },
         ),
         routes: {
@@ -59,7 +64,7 @@ class MyApp extends StatelessWidget {
           OrdersScreen.routeName: (ctx) => OrdersScreen(),
           UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
           EditProductScreen.routeName: (ctx) => EditProductScreen(),
-          LoginScreen.routeName: (ctx) => LoginScreen(), // Add login route
+          AuthScreen.routeName: (ctx) => AuthScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),
