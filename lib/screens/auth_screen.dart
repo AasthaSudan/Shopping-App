@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../screens/products_overview_screen.dart';
+import '../screens/products_overview_screen.dart';  // ✅ Import fixed
 
 class AuthScreen extends StatefulWidget {
   static const routeName = '/auth';
@@ -18,7 +18,7 @@ class _AuthScreenState extends State<AuthScreen> {
   var _isSignUp = false;
   var _isLoading = false;
 
-  void _submit() async {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -30,21 +30,36 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       if (_isSignUp) {
         await Provider.of<AuthProvider>(context, listen: false).signUp(
-          _emailController.text,
-          _passwordController.text,
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
       } else {
         await Provider.of<AuthProvider>(context, listen: false).signIn(
-          _emailController.text,
-          _passwordController.text,
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
       }
-      Navigator.of(context).pushReplacementNamed(ProductsOverviewScreen.routeName);
-    } catch (error) {
+    } on FirebaseAuthException catch (e) {
+      // ✅ Catch Firebase-specific errors
       String errorMessage = 'Authentication failed!';
-      if (error.toString().contains('Invalid credentials')) {
-        errorMessage = 'Incorrect email or password.';
+      switch (e.code) {
+        case 'email-already-in-use':
+          errorMessage = 'This email is already registered.';
+          break;
+        case 'invalid-email':
+          errorMessage = 'The email address is invalid.';
+          break;
+        case 'user-not-found':
+          errorMessage = 'No account found for this email.';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Incorrect password. Please try again.';
+          break;
+        case 'weak-password':
+          errorMessage = 'Password should be at least 6 characters.';
+          break;
       }
+
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -60,6 +75,8 @@ class _AuthScreenState extends State<AuthScreen> {
           ],
         ),
       );
+    } catch (error) {
+      print('🔥 Unknown Auth Error: $error');
     }
 
     setState(() {
@@ -118,7 +135,10 @@ class _AuthScreenState extends State<AuthScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 12.0,
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                       ),
@@ -126,7 +146,9 @@ class _AuthScreenState extends State<AuthScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter an email address.';
-                        } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
+                        } else if (!RegExp(
+                          r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
+                        ).hasMatch(value)) {
                           return 'Enter a valid email address.';
                         }
                         return null;
@@ -142,7 +164,10 @@ class _AuthScreenState extends State<AuthScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 12.0,
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                       ),
@@ -165,9 +190,10 @@ class _AuthScreenState extends State<AuthScreen> {
                         child: Text(_isSignUp ? 'Sign Up' : 'Sign In'),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 15
-                          ), backgroundColor: Colors.white,
+                            vertical: 15,
+                            horizontal: 15,
+                          ),
+                          backgroundColor: Colors.white,
                           textStyle: TextStyle(fontSize: 18),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
