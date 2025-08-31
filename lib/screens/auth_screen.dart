@@ -58,6 +58,7 @@ class _AuthScreenState extends State<AuthScreen> {
             end: Alignment.bottomRight,
           ),
         ),
+        padding: EdgeInsets.only(top: 50),
         child: SafeArea(
           child: Column(
             children: [
@@ -98,7 +99,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 labelText: 'Full Name',
                                 labelStyle: TextStyle(color: Colors.black87),
                                 prefixIcon:
-                                Icon(Icons.person, color: Colors.blue),
+                                Icon(Icons.person, color: Colors.black),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                 ),
@@ -120,7 +121,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               labelText: 'Email',
                               labelStyle: TextStyle(color: Colors.black87),
                               prefixIcon:
-                              Icon(Icons.email, color: Colors.blue),
+                              Icon(Icons.email, color: Colors.black),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
@@ -141,7 +142,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               labelText: 'Password',
                               labelStyle: TextStyle(color: Colors.black87),
                               prefixIcon:
-                              Icon(Icons.lock, color: Colors.blue),
+                              Icon(Icons.lock, color: Colors.black),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
@@ -158,9 +159,9 @@ class _AuthScreenState extends State<AuthScreen> {
                             Padding(
                               padding: EdgeInsets.only(top: 8),
                               child: Align(
-                                alignment: Alignment.centerLeft,
+                                alignment: Alignment.center,
                                 child: Text(
-                                  "Tip: Use at least 6 characters with a mix of letters & numbers",
+                                  "Use at least 6 characters with a mix of letters & numbers",
                                   style: TextStyle(
                                       fontSize: 12, color: Colors.black54),
                                 ),
