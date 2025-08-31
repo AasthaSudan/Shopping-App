@@ -1,8 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../screens/products_overview_screen.dart';  // ✅ Import fixed
 
 class AuthScreen extends StatefulWidget {
   static const routeName = '/auth';
@@ -14,18 +12,15 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   var _isSignUp = false;
   var _isLoading = false;
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       if (_isSignUp) {
@@ -39,179 +34,191 @@ class _AuthScreenState extends State<AuthScreen> {
           _passwordController.text.trim(),
         );
       }
-    } on FirebaseAuthException catch (e) {
-      // ✅ Catch Firebase-specific errors
-      String errorMessage = 'Authentication failed!';
-      switch (e.code) {
-        case 'email-already-in-use':
-          errorMessage = 'This email is already registered.';
-          break;
-        case 'invalid-email':
-          errorMessage = 'The email address is invalid.';
-          break;
-        case 'user-not-found':
-          errorMessage = 'No account found for this email.';
-          break;
-        case 'wrong-password':
-          errorMessage = 'Incorrect password. Please try again.';
-          break;
-        case 'weak-password':
-          errorMessage = 'Password should be at least 6 characters.';
-          break;
-      }
-
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text('Authentication Failed'),
-          content: Text(errorMessage),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-              },
-              child: Text('Okay'),
-            ),
-          ],
-        ),
-      );
     } catch (error) {
-      print('🔥 Unknown Auth Error: $error');
+      print("Auth Error: $error");
     }
 
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() => _isLoading = false);
   }
 
   void _switchAuthMode() {
-    setState(() {
-      _isSignUp = !_isSignUp;
-    });
+    setState(() => _isSignUp = !_isSignUp);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isSignUp ? 'Sign Up' : 'Sign In'),
-        backgroundColor: Colors.blueGrey,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFA7C7E7), Color(0xFFF1D1D1)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFA7C7E7), Color(0xFFF1D1D1)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          padding: EdgeInsets.all(20),
+        ),
+        child: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 50),
-                child: Text(
-                  _isSignUp ? 'Create a New Account' : 'Welcome Back!',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+            children: [
+              SizedBox(height: 30),
+
+              // ✅ Branding
+              Icon(Icons.shopping_bag, size: 90, color: Colors.black87),
+              Text(
+                "Trendora",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87, // Darker
                 ),
               ),
-              SizedBox(height: 40),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        labelStyle: TextStyle(fontSize: 18),
-                        prefixIcon: Icon(Icons.email, color: Colors.blue),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 12.0,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter an email address.';
-                        } else if (!RegExp(
-                          r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
-                        ).hasMatch(value)) {
-                          return 'Enter a valid email address.';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: TextStyle(fontSize: 18),
-                        prefixIcon: Icon(Icons.lock, color: Colors.blue),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 12.0,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a password.';
-                        } else if (value.length < 6) {
-                          return 'Password must be at least 6 characters long.';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    if (_isLoading)
-                      CircularProgressIndicator()
-                    else
-                      ElevatedButton(
-                        onPressed: _submit,
-                        child: Text(_isSignUp ? 'Sign Up' : 'Sign In'),
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 15,
-                          ),
-                          backgroundColor: Colors.white,
-                          textStyle: TextStyle(fontSize: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: 5,
-                        ),
-                      ),
-                  ],
-                ),
+              SizedBox(height: 10),
+              Text(
+                "Sign in to continue shopping your favorites!",
+                style: TextStyle(color: Colors.black54, fontSize: 18),
+                textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
-              TextButton(
-                onPressed: _switchAuthMode,
-                child: Text(
-                  _isSignUp
-                      ? 'Already have an account? Sign In'
-                      : 'Don\'t have an account? Sign Up',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+
+              // ✅ Form
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(20),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          if (_isSignUp)
+                            TextFormField(
+                              controller: _nameController,
+                              decoration: InputDecoration(
+                                labelText: 'Full Name',
+                                labelStyle: TextStyle(color: Colors.black87),
+                                prefixIcon:
+                                Icon(Icons.person, color: Colors.blue),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your name.';
+                                }
+                                return null;
+                              },
+                            ),
+                          if (_isSignUp) SizedBox(height: 16),
+
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              labelText: 'Email',
+                              labelStyle: TextStyle(color: Colors.black87),
+                              prefixIcon:
+                              Icon(Icons.email, color: Colors.blue),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            validator: (value) => value == null ||
+                                !value.contains('@')
+                                ? 'Enter valid email'
+                                : null,
+                          ),
+                          SizedBox(height: 16),
+
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              labelStyle: TextStyle(color: Colors.black87),
+                              prefixIcon:
+                              Icon(Icons.lock, color: Colors.blue),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            validator: (value) => value == null ||
+                                value.length < 6
+                                ? 'Password must be 6+ chars'
+                                : null,
+                          ),
+
+                          if (_isSignUp)
+                            Padding(
+                              padding: EdgeInsets.only(top: 8),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Tip: Use at least 6 characters with a mix of letters & numbers",
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.black54),
+                                ),
+                              ),
+                            ),
+
+                          SizedBox(height: 20),
+
+                          if (_isLoading)
+                            CircularProgressIndicator()
+                          else
+                            ElevatedButton(
+                              onPressed: _submit,
+                              child: Text(_isSignUp ? 'Sign Up' : 'Sign In'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black87,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 15, horizontal: 25),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                            ),
+                          SizedBox(height: 10),
+
+                          if (!_isSignUp)
+                            TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                "Forgot Password?",
+                                style: TextStyle(
+                                    color: Colors.black87, fontSize: 14),
+                              ),
+                            ),
+
+                          TextButton(
+                            onPressed: _switchAuthMode,
+                            child: Text(
+                              _isSignUp
+                                  ? "Already have an account? Sign In"
+                                  : "Don't have an account? Sign Up",
+                              style: TextStyle(
+                                  color: Colors.black87, fontSize: 16),
+                            ),
+                          ),
+
+                          SizedBox(height: 10),
+                          Text(
+                            "By continuing, you agree to our Terms of Service & Privacy Policy.",
+                            style: TextStyle(
+                                color: Colors.black54, fontSize: 15),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

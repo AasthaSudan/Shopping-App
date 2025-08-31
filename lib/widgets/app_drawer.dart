@@ -44,12 +44,13 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.exit_to_app),
             title: Text('Sign Out'),
             onTap: () {
+              Navigator.of(context).pop(); // Close drawer first
               Provider.of<AuthProvider>(context, listen: false).signOut();
               Navigator.of(context).pushReplacementNamed(AuthScreen.routeName); // Redirect to AuthScreen
             },
           )
         ],
-      ),
+      ), // Close drawer first
     );
   }
 }
